@@ -14,7 +14,10 @@ export class UserInfoPageComponent implements OnInit {
   public currentUser = signal<User|undefined>(undefined);
   public userWasFound = signal(true);
 
-
+  public fullName = computed<string>( () => {
+    if ( !this.currentUser() ) return 'Usuario no encontrado';
+    return `${ this.currentUser()?.first_name } ${ this.currentUser()?.last_name }`;
+  });
 
 
   ngOnInit(): void {
@@ -29,8 +32,15 @@ export class UserInfoPageComponent implements OnInit {
 
 // hacemos la peticion http
     this.usersService.getUserById( id )
-      .subscribe(user => {
-        this.currentUser.set(user)
+      .subscribe({
+        next: (user) => {
+         this.currentUser.set( user );
+         this.userWasFound.set(true);
+        },
+        error: () => {
+          this.userWasFound.set(false);
+          this.currentUser.set(undefined);
+        },
       });
 
 
