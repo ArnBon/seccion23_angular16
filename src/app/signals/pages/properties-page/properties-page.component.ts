@@ -5,9 +5,9 @@ import { User } from '../../interfaces/user-request.interface';
   templateUrl: './properties-page.component.html',
   styleUrls: ['./properties-page.component.css']
 })
-export class PropertiesPageComponent {
+export class PropertiesPageComponent implements OnInit {
 
-
+  public counter = signal( 10 );
   public user = signal<User>( {
     id: 1,
     email: 'george.bluth@reqres.in',
@@ -18,7 +18,31 @@ export class PropertiesPageComponent {
 
   public fullName = computed( () => `${ this.user().first_name } ${ this.user().last_name }` );
 
- onFieldUpdated( field: keyof User, value: string ) {
+  public userChangedEffect = effect( () => {
+    // Todo: Descomentar esta línea
+    console.log( `${ this.user().first_name } - ${ this.counter() } ` );
+  } );
+
+  ngOnInit(): void {
+    setInterval( () => {
+      this.counter.update( current => current + 1 );
+
+      // if ( this.counter() == 15 )
+      //   this.userChangedEffect.destroy();
+    }, 1000 );
+  }
+
+  ngOnDestroy(): void {
+    // this.userChangedEffect.destroy();
+  }
+
+  increaseBy( value: number ) {
+    this.counter.update( current => current + value );
+  }
+
+
+
+  onFieldUpdated( field: keyof User, value: string ) {
 
     // this.user.set({
     //   ...this.user(),
